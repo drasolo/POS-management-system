@@ -2,486 +2,202 @@ package org.example;
 
 import Clase.*;
 
-
-import java.util.*;  // Wildcard import for all classes in java.util
+import java.util.Map;
 import java.util.Scanner;
 
 public class Main {
-    static BonRepository bonrepository = BonRepository.getInstance();
+    static BonRepository bonRepository = BonRepository.getInstance();
     static ClientRepository clientRepository = ClientRepository.getInstance();
-
+    static ProductRepository productRepository = ProductRepository.getInstance();
+    static EmployeeRepository employeeRepository = EmployeeRepository.getInstance();
+    static AdminRepository adminRepository = AdminRepository.getInstance();
     static Scanner sc = new Scanner(System.in);
 
+    private static Client loggedInClient;
+    private static Employee loggedInEmployee;
+    private static Admin loggedInAdmin;
+    private static NotificationService notificationService = new NotificationService(); // Initialize the NotificationService instance
+
     public static void main(String[] args) {
-
-
         data.initialize();
 
+        int option;
+        boolean running = true;
 
-
-        int optiune;
-        boolean ok=true;
-
-        while(ok){
+        while (running) {
             System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
             System.out.println("Take action as:");
             System.out.println("\t 1 -> Client");
             System.out.println("\t 2 -> Employee");
-            System.out.println("\t 3 -> Unknown");
-            System.out.println("\t 4 -> Admin");
+            System.out.println("\t 3 -> Admin");
+            System.out.println("\t 4 -> Guest");
             System.out.println("\t 0 -> Exit Program");
-            System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");//Meniu Principal
+            System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
-            while(true) {
-                try {
-                    System.out.print("Optiune: ");
-                    optiune = sc.nextInt();
+            option = sc.nextInt();
+
+            switch (option) {
+                case 1:
+                    handleClientActions();
                     break;
-                } catch (InputMismatchException e) {
-                    System.out.print("\n\t!!!Trebuie sa introduceti un numar intreg!!!\n\n");
-                    sc.next();
-                }
-            }//Citire optiune
-
-            switch(optiune){
-                case 1 ->{
-
-                    int optiune1;
-                    boolean ok1 = true;
-                    //variabile initiate
-
-                    if (login()) {
-                        System.out.println("Login successful!");
-                        // Proceed with client-specific actions
-
-
-
-                        while(ok1){
-
-
-
-                            System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-                            System.out.println("Esti in modul Client");
-                            System.out.println("\t 1 -> Interogare Bonuri");
-                            System.out.println("\t 2 -> Adaugare Bon");         //Incepe sa scanezi
-                            System.out.println("\t 3 -> Statistici");
-                            System.out.println("\t 4 -> Detalii cont");
-                            System.out.println("\t 0 -> Exit Client");
-                            System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");//Meniu 1. Client
-
-                            while(true) {
-                                try {
-                                    System.out.print("Optiune: ");
-                                    optiune1 = sc.nextInt();
-                                    break;
-                                } catch (InputMismatchException e) {
-                                    System.out.print("\n\t!!!Trebuie sa introduceti un numar intreg!!!\n\n");
-                                    sc.next();
-                                }
-                            }//Citire optiune
-
-                            switch (optiune1)
-                            {
-                                case 1 -> {
-                                    int optiune11;
-
-                                    while(true){
-                                        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-                                        System.out.println("<Interogare Bonuri>");
-                                        int i = 1;
-                                        for (Reciept reciept : bonrepository.reciepts) {
-                                            System.out.println("\t " + i + " -> " + reciept.getBonID());
-                                            i += 1;
-                                        }
-                                        System.out.println("\t 0 -> Exit Interogare");
-                                        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");//Meniu Interogare bonuri
-
-                                        while(true) {
-                                            try {
-                                                System.out.print("Optiune: ");
-                                                optiune11 = sc.nextInt();
-                                                break;
-                                            } catch (InputMismatchException e) {
-                                                System.out.print("\n\t!!!Trebuie sa introduceti un numar intreg!!!\n\n");
-                                                sc.next();
-                                            }
-                                        }//Introducere optiune11
-
-
-                                        if (optiune11 == 0) {
-                                            System.out.println("\n Exiting Products from Bon");
-                                            break;
-                                        }// Exit the current loop
-                                        else if (optiune11 > 0 && optiune11 <= bonrepository.reciepts.size()) {
-                                            Reciept selectedReciept = bonrepository.reciepts.get(optiune11 - 1); // Getting the selected bon
-                                            System.out.println("You selected Bon: " + selectedReciept.getBonID());
-
-                                            // Display items inside the selected Bon
-                                            System.out.println("Items in Bon " + selectedReciept.getBonID() + ":");
-                                            int itemIndex = 1;
-                                            for (var item : selectedReciept.getTupleList()) { // Assuming getTupleList() returns a list of SimpleEntry objects
-                                                System.out.println("\t" + itemIndex + ") Product: " + item.getKey().getBarcode() + ", Quantity: " + item.getValue());
-                                                itemIndex++;
-                                            }
-                                        }// 1.1.1 Interogare Produse de pe bon
-                                        else {
-                                            System.out.println("\n\t!!!Invalid option!!!\n\n");
-                                        }
-                                        //
-
-                                    } // Interogare Bonuri while
-
-                                }//1.1 Interogare Bonuri
-                                //to do
-                                //afisarea bonurilor sa fie pe luna
-                                //sa se scrie totalul bonului la interogarea unuia
-                                //
-
-
-                                case 2 -> {
-                                    int optiune12;
-                                    boolean ok12 = true;
-                                    Reciept selectedReciept = null;
-                                    Reciept newReciept = new Reciept();  // Automatically generates a new ID with the next sequence number
-                                    BonRepository.getInstance().addBon(newReciept);  // This also increments the counter
-                                    selectedReciept = newReciept;  // Set the newly created Bon as the selected Bon for further operations
-                                    System.out.println("New Bon created with ID: " + newReciept.getBonID());
-
-
-//                                de adaugat nextId pentru metoda
-
-//                                public static String generateBonID() {
-//                                    return "BON" + nextId++;  // Increment and return the next available ID
-//                                }
-
-                                    while (ok12){
-                                        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
-                                        System.out.println("<Adaugare Bon>");
-                                        System.out.println("\t 1 -> Adaugare produs pe bon");
-                                        System.out.println("\t 2 -> Stergere prdus de pe bon");
-                                        System.out.println("\t 0 -> Inchidere Bon");
-
-                                        while(true) {
-                                            try {
-                                                System.out.print("Optiune: ");
-                                                optiune12 = sc.nextInt();
-                                                break;
-                                            } catch (InputMismatchException e) {
-                                                System.out.print("\n\t!!!Trebuie sa introduceti un numar intreg!!!\n\n");
-                                                sc.next();
-                                            }
-                                        }//Reading option for <Adaugare Bon>
-
-                                        switch (optiune12) {
-                                            case 1 -> {  // Add product to bon
-                                                System.out.println("Adding product to the bon.");
-                                                System.out.print("Enter product code: ");
-                                                String productCode = sc.next();                     //Reading BonID
-                                                System.out.print("Enter quantity to add: ");
-                                                int quantityToAdd;
-                                                while (true) {
-                                                    try {
-                                                        quantityToAdd = sc.nextInt();
-                                                        break;
-                                                    } catch (InputMismatchException e) {
-                                                        System.out.print("\n\t!!!Please enter an integer for quantity!!!\n\n");
-                                                        sc.next();  // Consume the wrong input
-                                                    }
-                                                }//Reading Quantity
-
-                                                selectedReciept.addProduct(ProductRepository.getProductByBarcode(productCode), quantityToAdd);  // Assuming selectedBon is your current bon object
-                                                System.out.println("Product added successfully.");
-                                            }//Adding Produs to Bon
-                                            case 2 -> {  // Remove product from bon
-                                                System.out.println("Removing product from the bon.");
-                                                System.out.print("Enter product code: ");
-                                                String productCode = sc.next();                     //Reading BonID
-                                                System.out.print("Enter quantity to remove: ");
-                                                int quantityToRemove;
-
-                                                while (true) {
-                                                    try {
-                                                        quantityToRemove = sc.nextInt();
-                                                        if (quantityToRemove > 0) {
-                                                            break;
-                                                        } else {
-                                                            System.out.print("\n\t!!!Quantity should be greater than zero!!!\n\n");
-                                                        }
-                                                    } catch (InputMismatchException e) {
-                                                        System.out.print("\n\t!!!Please enter an integer for quantity!!!\n\n");
-                                                        sc.next();  // Consume the wrong input
-                                                    }
-                                                }//Reading Quantity
-
-                                                // Here you would call a method to remove a product from the bon, e.g.,
-                                                selectedReciept.removeProduct(productCode, quantityToRemove);  // Assuming selectedBon is your current bon object
-                                                System.out.println("Product removed successfully.");
-                                            }//Removing Produs from Bon
-                                            case 0 -> {
-                                                System.out.println("\nExiting Modification Menu");
-
-                                                ok12 = false;
-                                            }// Exit modification menu
-                                        }
-
-
-
-                                    }//<Adaugare Bon>
-                                }//1.2 Adaugare Bon  (Practic Clientul se apuca de scanat)
-                                //to dos
-                                //de modificat generarea de bonID ca se vada si la <Interogare Bonuri>
-
-
-                                case 3 -> {
-
-                                    int optiune13;
-
-                                    System.out.println("-------------------------------------------------------------------------------------------------------------------------------");
-                                    System.out.println("1.3 Statistici");
-                                    System.out.println("\t 1 -> In functie de suma cheltuita");
-                                    System.out.println("\t 2 -> In functie de nr de achizitii");//adica de cate ori ai cumparat produse dintr-o gama
-                                    System.out.println("\t 0 -> Exit Meniu Statistici");
-                                    System.out.println("-------------------------------------------------------------------------------------------------------------------------------");
-                                    //Meniu
-                                    //Mainly se vor afisa categoriile
-
-                                    while(true) {
-                                        try {
-                                            System.out.print("Optiune: ");
-                                            optiune13 = sc.nextInt();
-                                            break;
-                                        } catch (InputMismatchException e) {
-                                            System.out.print("\n\t!!!Trebuie sa introduceti un numar intreg!!!\n\n");
-                                            sc.next();
-                                        }
-                                    }//Citire optiune
-
-                                    switch (optiune13){
-                                        case 1 ->{
-                                            //Parse all the products from the current client and rank first 10 categories that have the most money spent on
-                                        }
-
-                                        case 2 ->{}
-
-                                        case 0 ->{
-                                            System.out.println("\n Exiting Statistici");
-                                            break;
-                                        }
-
-                                        default -> System.out.println("Optiune invalida. Va rugam sa alegeti 1 sau 2.");
-                                    }
-
-
-
-                                }//1.3 Statistici
-
-                                case 4 -> {
-                                    System.out.println("------------------------------------------------------------------------------------------------------------------------------");
-                                    System.out.println("Detalii cont");
-                                    System.out.println("\t 1.Name: " + Client.getName());
-                                    System.out.println("\t 2.Surname: " + Client.getSurname());
-                                    System.out.println("\t 3.Email: " + Client.getEmail());
-                                    System.out.println("\t 4.CNP: " + Client.getCNP());
-                                    System.out.println("\t 5.PhoneNumber: " + Client.getPhoneNumber());
-                                    System.out.println("\t 6.ID: " + Client.getID());
-                                    System.out.println("\t 7.Password: " + Client.getPassword());
-                                    System.out.println("\t 8.Register Date: " + Client.getRegisterDate());
-                                    System.out.println("\t 9.Birth Date: " + Client.getBirthDate());
-                                    System.out.println("\t 0 -> Exit Details");
-                                    System.out.println("------------------------------------------------------------------------------------------------------------------------------");
-                                    //Meniu 1.4
-
-
-                                    int optiune14;
-                                    //variabile initiate
-
-                                    while(true) {
-                                        try {
-                                            System.out.print("Optiune: ");
-                                            optiune14 = sc.nextInt();
-                                            break;
-                                        } catch (InputMismatchException e) {
-                                            System.out.print("\n\t!!!Trebuie sa introduceti un numar intreg!!!\n\n");
-                                            sc.next();
-                                        }
-                                    }//Citire optiune
-
-                                    switch (optiune14) {
-                                        case 5 -> {
-                                            // Option to change the phone number
-                                            System.out.print("Enter new phone number: ");
-                                            String newPhoneNumber;
-                                            try {
-                                                System.out.print("newPhoneNumber: ");
-                                                newPhoneNumber = sc.nextLine();
-
-                                                if (Client.validateTelephoneNumber(newPhoneNumber)) {
-                                                    Client.setClientPhoneNumber(newPhoneNumber);
-                                                    System.out.println("Phone number updated successfully.");
-                                                } else {
-                                                    System.out.println("Invalid phone number format. Please try again.");
-                                                }
-                                                break;
-                                            } catch (InputMismatchException e) {
-                                                System.out.print("\n\t!!!Trebuie sa introduceti un numar intreg!!!\n\n");
-                                                sc.next();
-                                            }
-
-                                        }
-                                        case 7 -> {
-                                            // Option to change the password
-                                            System.out.print("Enter current password: ");
-                                            String currentPassword = sc.nextLine();
-                                            System.out.print("Enter new password: ");
-                                            String newPassword = sc.nextLine();
-                                            if (currentPassword.equals(Client.getPassword())) {
-                                                Client.setClientPassword(newPassword);
-                                                System.out.println("Password changed successfully.");
-                                            } else {
-                                                System.out.println("Incorrect current password.");
-                                            }
-                                        }
-                                        default -> {
-                                            System.out.println("Nu poti schimba acest detaliu");
-                                        }
-                                    }
-
-
-
-
-//
-//                                Number to change:
-
-
-                                }//1.4 Detalii Cont
-
-                                case 0 -> {
-                                    System.out.println("\n Exiting Client");
-                                    ok1=false;
-                                    break;
-                                }//1.0 Exiting Client
-                            }
-                        } //while client
-
-
-
-                    }
-                    else {
-                        System.out.println("Login failed!");
-                    }
-
-
-                }//1. Client
-
-                case 2 ->{
-                    int ceva2;
-
-
-                    //Parola:
-                    //-----------------------------------------------------------
-                    //1 -> Adaugare Produs In Magazin
-                    //2 -> Eliminare Produs In Magazin
-                    //3 -> Modificare Stoc
-                    //4 -> Adaugare Categorie
-                    //5 -> Eliminare Categorie
-                    //6 -> Interogare Date Clienti
-                    //7 -> Modificare Date Produs
-
-//                        1.1
-//                        Nume Produs:
-//                        Categorie:
-//                        Barcode:
-//                        Pret:
-//                        Discount:
-//                        Stoc:
-
-
-//                        1.2
-//                        1 -> Cauta Produsul:
-//                        2 -> Sau sterge produsul dupa barcode:
-
-//                        1.3
-//                        Nr. Bucati venite in depozit:
-//                        1 -> Cauta Produsul:
-//                        2 -> Sau adauga in stoc dupa barcode:
-
-//                        1.4
-//                        Adauga Categorie:
-//                        Suitable for minors? y/n
-
-//                        1.5
-//                        1 -> Elimina Categorie:
-//                        2 -> Cauta Categorie
-
-//                        1.6
-//                        1 -> Client name - Client ID;
-//                        2 -> Client name - Client ID;
-
-//                            1.6.x
-//                                1.1;
-//                                2.3;
-//                                2.4;
-
-
-//                        1.7
-//                        1 -> Produs name - Produs ID;
-//                        2 -> Produs name - Produs ID;
-//                        3 -> Produs name - Produs ID;
-//                        4 -> Produs name - Produs ID;
-
-
-//                            1.7.x
-//                              Nume Produs:
-//                              Categorie:
-//                              Barcode:
-//                              Pret:
-//                              Discount:
-//                              Stoc:
-
-
-
-                }//2. Employee
-
-                case 3 ->{
-                    int ceva3;
-
-//                    1 -> Devino membru;
-//                    2 -> Adauga bon;
-
-                }//3. Unknown
-
-                case 4 ->{
-                    int ceva4;
-
-//                    idk what to do
-//                    1 -> Change/See users passwords
-
-
-                }//4. Admin
-
-                case 0 ->{
-                    System.out.println("\nMultumesc pentru ca mi-ati folosit programul, o zi buna! :)");
-                    ok=false;
+                case 2:
+                    handleEmployeeActions();
                     break;
-                }//0. Exit program
-
-            }//main switch
+                case 3:
+                    handleAdminActions();
+                    break;
+                case 4:
+                    handleGuestActions();
+                    break;
+                case 0:
+                    running = false;
+                    System.out.println("\nThank you for using the program. Have a great day!");
+                    break;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+            }
         }
-
-
     }
 
+    private static void handleClientActions() {
+        if (loginClient()) {
+            System.out.println("Login successful!");
+            int option;
+            boolean running = true;
+            while (running) {
+                System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+                System.out.println("Client Actions:");
+                System.out.println("\t 1 -> Interogare Bonuri");
+                System.out.println("\t 2 -> Adaugare Bon");
+                System.out.println("\t 3 -> Statistici");
+                System.out.println("\t 4 -> Detalii Cont");
+                System.out.println("\t 5 -> Subscribe to Notifications");
+                System.out.println("\t 6 -> Unsubscribe from Notifications");
+                System.out.println("\t 0 -> Exit Client Mode");
+                System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
-    private static boolean login() {
+                option = sc.nextInt();
+
+                switch (option) {
+                    case 1:
+                        interogareBonuri();
+                        break;
+                    case 2:
+                        adaugareBon();
+                        break;
+                    case 3:
+                        statistici();
+                        break;
+                    case 4:
+                        detaliiCont();
+                        break;
+                    case 5:
+                        notificationService.subscribe(loggedInClient);
+                        break;
+                    case 6:
+                        notificationService.unsubscribe(loggedInClient);
+                        break;
+                    case 0:
+                        running = false;
+                        System.out.println("Exiting Client Mode.");
+                        break;
+                    default:
+                        System.out.println("Invalid option. Please try again.");
+                }
+            }
+        } else {
+            System.out.println("Login failed!");
+        }
+    }
+
+    private static void registerGuestAsClient(Guest guest) {
+        sc.nextLine(); // Consume the newline leftover
+        ClientRepository clientRepository = ClientRepository.getInstance();
+        boolean registered = false;
+        while (!registered) {
+            Client newClient = guest.registerAsClient(sc);
+            if (validateClient(newClient)) {
+                clientRepository.addClient(newClient);
+                notificationService.subscribe(newClient); // Correctly reference the instance method
+                System.out.println("Registration successful! You are now a client.");
+                registered = true;
+            } else {
+                System.out.println("Invalid details. Please re-enter your information.");
+            }
+        }
+    }
+
+    private static boolean validateClient(Client client) {
+        return Client.validateEmail(client.getClientEmail()) &&
+                Client.validateCNP(client.getCNP()) &&
+                Client.validateTelephoneNumber(client.getClientPhoneNumber());
+    }
+
+    private static void handleGuestActions() {
+        Guest guest = new Guest();
+        int option;
+        boolean running = true;
+        while (running) {
+            System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+            System.out.println("Guest Actions:");
+            System.out.println("\t 1 -> Add product to receipt");
+            System.out.println("\t 2 -> Remove product from receipt");
+            System.out.println("\t 0 -> Finish and Register");
+            System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+            option = sc.nextInt();
+
+            switch (option) {
+                case 1:
+                    addProductToGuestReceipt(guest);
+                    break;
+                case 2:
+                    removeProductFromGuestReceipt(guest);
+                    break;
+                case 0:
+                    running = false;
+                    registerGuestAsClient(guest);
+                    break;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+            }
+        }
+    }
+
+    private static void addProductToGuestReceipt(Guest guest) {
+        System.out.print("Enter product code: ");
+        String productCode = sc.next();
+        System.out.print("Enter quantity to add: ");
+        int quantityToAdd = sc.nextInt();
+        Product product = ProductRepository.getProductByBarcode(productCode);
+        if (product != null) {
+            guest.addProductToReceipt(product, quantityToAdd);
+            System.out.println("Product added successfully.");
+        } else {
+            System.out.println("Product not found.");
+        }
+    }
+
+    private static void removeProductFromGuestReceipt(Guest guest) {
+        System.out.print("Enter product code: ");
+        String productCode = sc.next();
+        System.out.print("Enter quantity to remove: ");
+        int quantityToRemove = sc.nextInt();
+        guest.removeProductFromReceipt(productCode, quantityToRemove);
+        System.out.println("Product removed successfully.");
+    }
+
+    private static boolean loginClient() {
         sc.nextLine();  // Consume the newline leftover
         System.out.print("Enter email: ");
-        String email = sc.nextLine().trim();  // Trim the input to remove any accidental whitespace
+        String email = sc.nextLine().trim();
 
         System.out.print("Enter password: ");
         String password = sc.nextLine();
 
         Client client = clientRepository.getClientByEmail(email);
         if (client != null && client.checkPassword(password)) {
+            loggedInClient = client; // Store the logged-in client
             return true;
         } else {
             if (client == null) {
@@ -493,5 +209,374 @@ public class Main {
         }
     }
 
+    private static void interogareBonuri() {
+        if (loggedInClient == null) {
+            System.out.println("No client is currently logged in.");
+            return;
+        }
+        int option;
+        while (true) {
+            System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+            System.out.println("<Interogare Bonuri>");
+            int i = 1;
+            for (Reciept reciept : loggedInClient.getReceipts()) {
+                System.out.println("\t " + i + " -> " + reciept.getBonID());
+                i++;
+            }
+            System.out.println("\t 0 -> Exit Interogare");
+            System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
+            option = sc.nextInt();
+            if (option == 0) {
+                System.out.println("Exiting Interogare Bonuri.");
+                break;
+            } else if (option > 0 && option <= loggedInClient.getReceipts().size()) {
+                Reciept selectedReciept = loggedInClient.getReceipts().get(option - 1);
+                System.out.println("You selected Bon: " + selectedReciept.getBonID());
+                System.out.println("Items in Bon " + selectedReciept.getBonID() + ":");
+                int itemIndex = 1;
+                for (var item : selectedReciept.getProductEntries()) {
+                    System.out.println("\t" + itemIndex + ") Product: " + item.getKey().getBarcode() + ", Quantity: " + item.getValue());
+                    itemIndex++;
+                }
+            } else {
+                System.out.println("Invalid option. Please try again.");
+            }
+        }
+    }
+
+    private static void adaugareBon() {
+        if (loggedInClient == null) {
+            System.out.println("No client is currently logged in.");
+            return;
+        }
+        int option;
+        Reciept newReciept = new Reciept();
+        bonRepository.addBon(newReciept);
+        loggedInClient.addReceipt(newReciept);
+        System.out.println("New Bon created with ID: " + newReciept.getBonID());
+
+        boolean running = true;
+        while (running) {
+            System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+            System.out.println("<Adaugare Bon>");
+            System.out.println("\t 1 -> Adaugare produs pe bon");
+            System.out.println("\t 2 -> Stergere produs de pe bon");
+            System.out.println("\t 0 -> Inchidere Bon");
+            System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+            option = sc.nextInt();
+            switch (option) {
+                case 1:
+                    adaugareProdusPeBon(newReciept);
+                    break;
+                case 2:
+                    stergereProdusDePeBon(newReciept);
+                    break;
+                case 0:
+                    running = false;
+                    System.out.println("Inchidere Bon.");
+                    break;
+                default:
+                    System.out.println("Invalid option. Please try again.");
+            }
+        }
+    }
+
+    private static void adaugareProdusPeBon(Reciept reciept) {
+        System.out.println("Adding product to the bon.");
+        System.out.print("Enter product code: ");
+        String productCode = sc.next();
+        System.out.print("Enter quantity to add: ");
+        int quantityToAdd = sc.nextInt();
+        reciept.addProduct(ProductRepository.getProductByBarcode(productCode), quantityToAdd);
+        System.out.println("Product added successfully.");
+    }
+
+    private static void stergereProdusDePeBon(Reciept reciept) {
+        System.out.println("Removing product from the bon.");
+        System.out.print("Enter product code: ");
+        String productCode = sc.next();
+        System.out.print("Enter quantity to remove: ");
+        int quantityToRemove = sc.nextInt();
+        reciept.removeProduct(productCode, quantityToRemove);
+        System.out.println("Product removed successfully.");
+    }
+
+    private static void statistici() {
+        if (loggedInClient == null) {
+            System.out.println("No client is currently logged in.");
+            return;
+        }
+        int option;
+        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("Statistici");
+        System.out.println("\t 1 -> In functie de suma cheltuita");
+        System.out.println("\t 2 -> In functie de nr de achizitii");
+        System.out.println("\t 0 -> Exit Meniu Statistici");
+        System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+        option = sc.nextInt();
+        switch (option) {
+            case 1:
+                statisticiSumaCheltuita();
+                break;
+            case 2:
+                statisticiNrAchizitii();
+                break;
+            case 0:
+                System.out.println("Exiting Meniu Statistici.");
+                break;
+            default:
+                System.out.println("Invalid option. Please try again.");
+        }
+    }
+
+    private static void statisticiSumaCheltuita() {
+        if (loggedInClient == null) {
+            System.out.println("No client is currently logged in.");
+            return;
+        }
+        Map<String, Double> spendingByCategory = loggedInClient.getCategorySpending();
+        System.out.println("Spending by category:");
+        spendingByCategory.entrySet()
+                .stream()
+                .sorted(Map.Entry.<String, Double>comparingByValue().reversed())
+                .limit(10)
+                .forEach(entry -> System.out.println("Category: " + entry.getKey() + ", Amount: " + entry.getValue()));
+    }
+
+    private static void statisticiNrAchizitii() {
+        if (loggedInClient == null) {
+            System.out.println("No client is currently logged in.");
+            return;
+        }
+        Map<String, Integer> purchasesByCategory = loggedInClient.getCategoryPurchases();
+        System.out.println("Purchases by category:");
+        purchasesByCategory.entrySet()
+                .stream()
+                .sorted(Map.Entry.<String, Integer>comparingByValue().reversed())
+                .limit(10)
+                .forEach(entry -> System.out.println("Category: " + entry.getKey() + ", Count: " + entry.getValue()));
+    }
+
+    private static void detaliiCont() {
+        if (loggedInClient == null) {
+            System.out.println("No client is currently logged in.");
+            return;
+        }
+        System.out.println("------------------------------------------------------------------------------------------------------------------------------");
+        System.out.println("Detalii cont");
+        System.out.println("\t 1. Name: " + loggedInClient.getName());
+        System.out.println("\t 2. Surname: " + loggedInClient.getSurname());
+        System.out.println("\t 3. Email: " + loggedInClient.getEmail());
+        System.out.println("\t 4. CNP: " + loggedInClient.getCNP());
+        System.out.println("\t 5. PhoneNumber: " + loggedInClient.getPhoneNumber());
+        System.out.println("\t 6. ID: " + loggedInClient.getID());
+        System.out.println("\t 7. Password: " + loggedInClient.getPassword());
+        System.out.println("\t 8. Register Date: " + loggedInClient.getRegisterDate());
+        System.out.println("\t 9. Birth Date: " + loggedInClient.getBirthDate());
+        System.out.println("\t 0 -> Exit Details");
+        System.out.println("------------------------------------------------------------------------------------------------------------------------------");
+
+        int option = sc.nextInt();
+        switch (option) {
+            case 5:
+                System.out.print("Enter new phone number: ");
+                String newPhoneNumber = sc.next();
+                if (Client.validateTelephoneNumber(newPhoneNumber)) {
+                    loggedInClient.setClientPhoneNumber(newPhoneNumber);
+                    System.out.println("Phone number updated successfully.");
+                } else {
+                    System.out.println("Invalid phone number format. Please try again.");
+                }
+                break;
+            case 7:
+                System.out.print("Enter current password: ");
+                String currentPassword = sc.next();
+                System.out.print("Enter new password: ");
+                String newPassword = sc.next();
+                if (loggedInClient.checkPassword(currentPassword)) {
+                    loggedInClient.setClientPassword(newPassword);
+                    System.out.println("Password changed successfully.");
+                } else {
+                    System.out.println("Incorrect current password.");
+                }
+                break;
+            default:
+                System.out.println("Invalid option. Please try again.");
+        }
+    }
+
+    private static boolean loginEmployee() {
+        sc.nextLine();  // Consume the newline leftover
+        System.out.print("Enter Employee ID: ");
+        String id = sc.nextLine().trim();
+
+        System.out.print("Enter password: ");
+        String password = sc.nextLine();
+
+        Employee employee = employeeRepository.getEmployeeById(id);
+        if (employee != null && employee.checkPassword(password)) {
+            loggedInEmployee = employee; // Store the logged-in employee
+            return true;
+        } else {
+            if (employee == null) {
+                System.out.println("No employee found with the ID: " + id);
+            } else {
+                System.out.println("Incorrect password.");
+            }
+            return false;
+        }
+    }
+
+    private static boolean loginAdmin() {
+        sc.nextLine();  // Consume the newline leftover
+        System.out.print("Enter Admin ID: ");
+        String id = sc.nextLine().trim();
+
+        System.out.print("Enter password: ");
+        String password = sc.nextLine();
+
+        Admin admin = adminRepository.getAdminById(id);
+        if (admin != null && admin.checkPassword(password)) {
+            loggedInAdmin = admin; // Store the logged-in admin
+            return true;
+        } else {
+            if (admin == null) {
+                System.out.println("No admin found with the ID: " + id);
+            } else {
+                System.out.println("Incorrect password.");
+            }
+            return false;
+        }
+    }
+
+    private static void handleEmployeeActions() {
+        if (loginEmployee()) {
+            System.out.println("Login successful!");
+            int option;
+            boolean running = true;
+            while (running) {
+                System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+                System.out.println("Employee Actions:");
+                System.out.println("\t 1 -> Change Product Details");
+                System.out.println("\t 2 -> View Product Details");
+                System.out.println("\t 0 -> Exit Employee Mode");
+                System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+                option = sc.nextInt();
+
+                switch (option) {
+                    case 1:
+                        System.out.print("Enter product barcode: ");
+                        String barcode = sc.next();
+                        Product product = productRepository.getProductByBarcode(barcode);
+                        if (product != null) {
+                            loggedInEmployee.changeProductDetails(product, sc);
+                        } else {
+                            System.out.println("Product not found.");
+                        }
+                        break;
+                    case 2: // New case for viewing product details
+                        System.out.print("Enter product barcode: ");
+                        barcode = sc.next();
+                        product = productRepository.getProductByBarcode(barcode);
+                        if (product != null) {
+                            loggedInEmployee.visualizeProductDetails(product);
+                        } else {
+                            System.out.println("Product not found.");
+                        }
+                        break;
+                    case 0:
+                        running = false;
+                        System.out.println("Exiting Employee Mode.");
+                        break;
+                    default:
+                        System.out.println("Invalid option. Please try again.");
+                }
+            }
+        } else {
+            System.out.println("Login failed!");
+        }
+    }
+
+    private static void handleAdminActions() {
+        if (loginAdmin()) {
+            System.out.println("Login successful!");
+            int option;
+            boolean running = true;
+            while (running) {
+                System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+                System.out.println("Admin Actions:");
+                System.out.println("\t 1 -> Change Product Details");
+                System.out.println("\t 2 -> Change Client Details");
+                System.out.println("\t 3 -> View Product Details");
+                System.out.println("\t 4 -> Add Employee"); // New option
+                System.out.println("\t 5 -> Delete Employee"); // New option
+                System.out.println("\t 6 -> Change Employee Details"); // New option
+                System.out.println("\t 0 -> Exit Admin Mode");
+                System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
+
+                option = sc.nextInt();
+
+                switch (option) {
+                    case 1:
+                        System.out.print("Enter product barcode: ");
+                        String barcode = sc.next();
+                        Product product = productRepository.getProductByBarcode(barcode);
+                        if (product != null) {
+                            loggedInAdmin.changeProductDetails(product, sc);
+                        } else {
+                            System.out.println("Product not found.");
+                        }
+                        break;
+                    case 2:
+                        System.out.print("Enter client email: ");
+                        String email = sc.next();
+                        Client client = clientRepository.getClientByEmail(email);
+                        if (client != null) {
+                            loggedInAdmin.changeClientDetails(client, sc);
+                        } else {
+                            System.out.println("Client not found.");
+                        }
+                        break;
+                    case 3:
+                        System.out.print("Enter product barcode: ");
+                        barcode = sc.next();
+                        product = productRepository.getProductByBarcode(barcode);
+                        if (product != null) {
+                            loggedInAdmin.visualizeProductDetails(product);
+                        } else {
+                            System.out.println("Product not found.");
+                        }
+                        break;
+                    case 4: // New case for adding an employee
+                        loggedInAdmin.addEmployee(employeeRepository, sc);
+                        break;
+                    case 5: // New case for deleting an employee
+                        loggedInAdmin.deleteEmployee(employeeRepository, sc);
+                        break;
+                    case 6: // New case for changing employee details
+                        System.out.print("Enter employee ID: ");
+                        String employeeID = sc.next();
+                        Employee employee = employeeRepository.getEmployeeById(employeeID);
+                        if (employee != null) {
+                            loggedInAdmin.changeEmployeeDetails(employee, sc);
+                        } else {
+                            System.out.println("Employee not found.");
+                        }
+                        break;
+                    case 0:
+                        running = false;
+                        System.out.println("Exiting Admin Mode.");
+                        break;
+                    default:
+                        System.out.println("Invalid option. Please try again.");
+                }
+            }
+        } else {
+            System.out.println("Login failed!");
+        }
+    }
 }

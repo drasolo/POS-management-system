@@ -1,18 +1,16 @@
 package Clase;
 
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class ClientRepository {
 
-
-
-    public static List<Client> clients = new ArrayList<>();
+    private List<Client> clients;
 
     private ClientRepository() {
         clients = new ArrayList<>();
     }
+
     private static ClientRepository instance;
 
     public static ClientRepository getInstance() {
@@ -22,7 +20,7 @@ public class ClientRepository {
         return instance;
     }//instatierea Clasei ClientRepository
 
-    public static void addClient(Client client) {
+    public void addClient(Client client) {
         clients.add(client);
     }
 
@@ -30,7 +28,6 @@ public class ClientRepository {
         System.out.println(email);
 
         for (Client client : clients) {
-//            System.out.println(Client.getEmail());
             if (client.getEmail().equalsIgnoreCase(email.trim())) {  // Correct use of instance method
                 return client;
             }
@@ -38,7 +35,8 @@ public class ClientRepository {
         return null;  // Return null if no client is found
     }
 
-
-
+    public List<Client> getAllClients() {
+        return new ArrayList<>(clients);
+    }
 
 }
