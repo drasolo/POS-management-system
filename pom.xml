@@ -24,6 +24,13 @@
             <version>0.4</version>
         </dependency>
         <!-- Additional dependencies can be added here -->
+
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.26</version>
+        </dependency>
+
     </dependencies>
 
     <!-- Plugins section -->
@@ -41,5 +48,6 @@
             </plugin>
         </plugins>
     </build>
+
 
 </project>

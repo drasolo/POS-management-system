@@ -33,6 +33,10 @@ public class Employee {
         this.password = password;
     }
 
+    public String getPassword() {
+        return password;
+    }
+
     public void changeProductDetails(Product product, Scanner scanner) {
         System.out.println("Modify details for Product: " + product.getBarcode());
 

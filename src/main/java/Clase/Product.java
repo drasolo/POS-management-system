@@ -100,6 +100,15 @@ public class Product {
         return Price;
     }
 
+    public String getCountryCode() {
+        if (barcode != null && barcode.length() >= 2) {
+            return barcode.substring(0, 3);
+        } else if (barcode != null && barcode.length() >= 3) {
+            return barcode.substring(0, 2);
+        }
+        return "";
+    }
+
     public void setPrice(Double price) {
         this.Price = price;
     }
@@ -116,6 +125,23 @@ public class Product {
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 //constructors
 //-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+    public Product(String barcode, String name, String categoryId, double price, int stock, int discount) {
+        this.barcode = barcode;
+        this.Name = name;
+        this.CategoryId = categoryId;
+        this.Price = price;
+        this.Stock = stock;
+        this.Discount = discount;
+
+        if (!validateEAN13Barcode(barcode)) {
+            throw new IllegalArgumentException("Invalid barcode format.");
+        }
+        if (!validateDiscount()) {
+            throw new IllegalArgumentException("Invalid discount value. Discount must be between 0 and 100.");
+        }
+    }
 
     public Product(String Name, Integer stock, String barcode, String categoryId, Double Price, int discount) {
         this.Name = Name;

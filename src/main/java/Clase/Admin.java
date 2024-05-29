@@ -58,7 +58,7 @@ public class Admin extends Employee {
         System.out.println("Employee details updated successfully.");
     }
 
-    public void addEmployee(EmployeeRepository employeeRepository, Scanner scanner) {
+    public void addEmployee(EmployeeService employeeService, Scanner scanner) {
         System.out.print("Enter new employee ID: ");
         String employeeID = scanner.next();
         System.out.print("Enter new employee name: ");
@@ -68,18 +68,18 @@ public class Admin extends Employee {
         String password = scanner.nextLine();
 
         Employee newEmployee = new Employee(employeeID, name, password);
-        employeeRepository.addEmployee(newEmployee);
+        employeeService.addEmployee(newEmployee);
 
         System.out.println("Employee added successfully.");
     }
 
-    public void deleteEmployee(EmployeeRepository employeeRepository, Scanner scanner) {
+    public void deleteEmployee(EmployeeService employeeService, Scanner scanner) {
         System.out.print("Enter employee ID to delete: ");
         String employeeID = scanner.next();
-        Employee employee = employeeRepository.getEmployeeById(employeeID);
+        Employee employee = employeeService.getEmployeeById(employeeID);
 
         if (employee != null) {
-            employeeRepository.deleteEmployee(employeeID);
+            employeeService.deleteEmployee(employeeID);
             System.out.println("Employee deleted successfully.");
         } else {
             System.out.println("Employee not found.");

@@ -11,12 +11,16 @@ public class Main {
     static ProductRepository productRepository = ProductRepository.getInstance();
     static EmployeeRepository employeeRepository = EmployeeRepository.getInstance();
     static AdminRepository adminRepository = AdminRepository.getInstance();
+    static NotificationService notificationService = new NotificationService();
+    static ClientService clientService = new ClientService();
+    static ProductService productService = new ProductService();
+    static ReceiptService receiptService = new ReceiptService();
+    static EmployeeService employeeService = new EmployeeService();
     static Scanner sc = new Scanner(System.in);
 
     private static Client loggedInClient;
     private static Employee loggedInEmployee;
     private static Admin loggedInAdmin;
-    private static NotificationService notificationService = new NotificationService(); // Initialize the NotificationService instance
 
     public static void main(String[] args) {
         data.initialize();
@@ -112,12 +116,11 @@ public class Main {
 
     private static void registerGuestAsClient(Guest guest) {
         sc.nextLine(); // Consume the newline leftover
-        ClientRepository clientRepository = ClientRepository.getInstance();
         boolean registered = false;
         while (!registered) {
             Client newClient = guest.registerAsClient(sc);
             if (validateClient(newClient)) {
-                clientRepository.addClient(newClient);
+                clientService.addClient(newClient);
                 notificationService.subscribe(newClient); // Correctly reference the instance method
                 System.out.println("Registration successful! You are now a client.");
                 registered = true;
@@ -169,7 +172,7 @@ public class Main {
         String productCode = sc.next();
         System.out.print("Enter quantity to add: ");
         int quantityToAdd = sc.nextInt();
-        Product product = ProductRepository.getProductByBarcode(productCode);
+        Product product = productService.getProductByBarcode(productCode);
         if (product != null) {
             guest.addProductToReceipt(product, quantityToAdd);
             System.out.println("Product added successfully.");
@@ -198,6 +201,7 @@ public class Main {
         Client client = clientRepository.getClientByEmail(email);
         if (client != null && client.checkPassword(password)) {
             loggedInClient = client; // Store the logged-in client
+            AuditService.getInstance().logAction("Client login: " + email);
             return true;
         } else {
             if (client == null) {
@@ -205,9 +209,11 @@ public class Main {
             } else {
                 System.out.println("Incorrect password.");
             }
+            AuditService.getInstance().logAction("Failed client login: " + email);
             return false;
         }
     }
+
 
     private static void interogareBonuri() {
         if (loggedInClient == null) {
@@ -252,9 +258,10 @@ public class Main {
         }
         int option;
         Reciept newReciept = new Reciept();
-        bonRepository.addBon(newReciept);
+        receiptService.addReceipt(newReciept);
         loggedInClient.addReceipt(newReciept);
         System.out.println("New Bon created with ID: " + newReciept.getBonID());
+        AuditService.getInstance().logAction("Created new receipt for client: " + loggedInClient.getEmail());
 
         boolean running = true;
         while (running) {
@@ -269,9 +276,11 @@ public class Main {
             switch (option) {
                 case 1:
                     adaugareProdusPeBon(newReciept);
+                    AuditService.getInstance().logAction("Added product to receipt: " + newReciept.getBonID());
                     break;
                 case 2:
                     stergereProdusDePeBon(newReciept);
+                    AuditService.getInstance().logAction("Removed product from receipt: " + newReciept.getBonID());
                     break;
                 case 0:
                     running = false;
@@ -283,13 +292,14 @@ public class Main {
         }
     }
 
+
     private static void adaugareProdusPeBon(Reciept reciept) {
         System.out.println("Adding product to the bon.");
         System.out.print("Enter product code: ");
         String productCode = sc.next();
         System.out.print("Enter quantity to add: ");
         int quantityToAdd = sc.nextInt();
-        reciept.addProduct(ProductRepository.getProductByBarcode(productCode), quantityToAdd);
+        reciept.addProduct(productService.getProductByBarcode(productCode), quantityToAdd);
         System.out.println("Product added successfully.");
     }
 
@@ -416,7 +426,7 @@ public class Main {
         System.out.print("Enter password: ");
         String password = sc.nextLine();
 
-        Employee employee = employeeRepository.getEmployeeById(id);
+        Employee employee = employeeService.getEmployeeById(id);
         if (employee != null && employee.checkPassword(password)) {
             loggedInEmployee = employee; // Store the logged-in employee
             return true;
@@ -471,7 +481,7 @@ public class Main {
                     case 1:
                         System.out.print("Enter product barcode: ");
                         String barcode = sc.next();
-                        Product product = productRepository.getProductByBarcode(barcode);
+                        Product product = productService.getProductByBarcode(barcode);
                         if (product != null) {
                             loggedInEmployee.changeProductDetails(product, sc);
                         } else {
@@ -481,7 +491,7 @@ public class Main {
                     case 2: // New case for viewing product details
                         System.out.print("Enter product barcode: ");
                         barcode = sc.next();
-                        product = productRepository.getProductByBarcode(barcode);
+                        product = productService.getProductByBarcode(barcode);
                         if (product != null) {
                             loggedInEmployee.visualizeProductDetails(product);
                         } else {
@@ -512,9 +522,9 @@ public class Main {
                 System.out.println("\t 1 -> Change Product Details");
                 System.out.println("\t 2 -> Change Client Details");
                 System.out.println("\t 3 -> View Product Details");
-                System.out.println("\t 4 -> Add Employee"); // New option
-                System.out.println("\t 5 -> Delete Employee"); // New option
-                System.out.println("\t 6 -> Change Employee Details"); // New option
+                System.out.println("\t 4 -> Add Employee");
+                System.out.println("\t 5 -> Delete Employee");
+                System.out.println("\t 6 -> Change Employee Details");
                 System.out.println("\t 0 -> Exit Admin Mode");
                 System.out.println("--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------");
 
@@ -524,7 +534,7 @@ public class Main {
                     case 1:
                         System.out.print("Enter product barcode: ");
                         String barcode = sc.next();
-                        Product product = productRepository.getProductByBarcode(barcode);
+                        Product product = productService.getProductByBarcode(barcode);
                         if (product != null) {
                             loggedInAdmin.changeProductDetails(product, sc);
                         } else {
@@ -544,23 +554,23 @@ public class Main {
                     case 3:
                         System.out.print("Enter product barcode: ");
                         barcode = sc.next();
-                        product = productRepository.getProductByBarcode(barcode);
+                        product = productService.getProductByBarcode(barcode);
                         if (product != null) {
                             loggedInAdmin.visualizeProductDetails(product);
                         } else {
                             System.out.println("Product not found.");
                         }
                         break;
-                    case 4: // New case for adding an employee
-                        loggedInAdmin.addEmployee(employeeRepository, sc);
+                    case 4: // Change to pass EmployeeService
+                        loggedInAdmin.addEmployee(employeeService, sc);
                         break;
-                    case 5: // New case for deleting an employee
-                        loggedInAdmin.deleteEmployee(employeeRepository, sc);
+                    case 5: // Change to pass EmployeeService
+                        loggedInAdmin.deleteEmployee(employeeService, sc);
                         break;
-                    case 6: // New case for changing employee details
+                    case 6:
                         System.out.print("Enter employee ID: ");
                         String employeeID = sc.next();
-                        Employee employee = employeeRepository.getEmployeeById(employeeID);
+                        Employee employee = employeeService.getEmployeeById(employeeID);
                         if (employee != null) {
                             loggedInAdmin.changeEmployeeDetails(employee, sc);
                         } else {

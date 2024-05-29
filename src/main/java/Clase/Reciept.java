@@ -11,6 +11,7 @@ public class Reciept {
     protected List<SimpleEntry<Product, Integer>> Products;
     protected String BonID;
     protected LocalDate DataCumparare;
+    protected Client client; // Adăugăm referința către client
 
     // Getters
     public List<SimpleEntry<Product, Integer>> getProductEntries() {
@@ -23,6 +24,22 @@ public class Reciept {
 
     public LocalDate getPurchaseDate() {
         return DataCumparare;
+    }
+
+    public Client getClient() { // Adăugăm metoda getClient
+        return client;
+    }
+
+    public void setClient(Client client) { // Adăugăm metoda setClient
+        this.client = client;
+    }
+
+    public String getId() { // Adăugăm metoda getId
+        return BonID;
+    }
+
+    public void setId(String bonID) { // Adăugăm metoda setId
+        this.BonID = bonID;
     }
 
     // Constructors
